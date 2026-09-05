@@ -9,27 +9,28 @@ function typeHeroText() {
 	if (!typedName || !typedDescription || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 	typedName.textContent = '';
 	typedDescription.textContent = '';
-	let characterIndex = 0;
+	const typeWords = (element, text, onComplete, preserveLeadingSpace = false) => {
+		const words = text.trim().split(' ');
+		let wordIndex = 0;
+		let typedText = preserveLeadingSpace ? ' ' : '';
 
-	const typeNextCharacter = () => {
-		typedName.textContent += heroName[characterIndex];
-		characterIndex += 1;
-		if (characterIndex < heroName.length) {
-			window.setTimeout(typeNextCharacter, 34);
-			return;
-		}
+		const typeNextWord = () => {
+			typedText += words[wordIndex];
+			wordIndex += 1;
+			element.textContent = typedText;
+			if (wordIndex < words.length) {
+				typedText += ' ';
+				window.setTimeout(typeNextWord, 180);
+				return;
+			}
 
-		typeDescriptionCharacter();
+			onComplete?.();
+		};
+
+		typeNextWord();
 	};
 
-	let descriptionIndex = 0;
-	const typeDescriptionCharacter = () => {
-		typedDescription.textContent += heroDescription[descriptionIndex];
-		descriptionIndex += 1;
-		if (descriptionIndex < heroDescription.length) window.setTimeout(typeDescriptionCharacter, 34);
-	};
-
-	typeNextCharacter();
+	typeWords(typedName, heroName, () => typeWords(typedDescription, heroDescription, null, true));
 }
 
 // Keep all internal links smooth while preserving normal external links.
